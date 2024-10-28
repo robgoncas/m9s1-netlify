@@ -1,0 +1,44 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload</title>
+  <script>
+    async function uploadFile(event) {
+      event.preventDefault();
+
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput.files.length === 0) {
+        alert('Por favor, selecciona un archivo.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async () => {
+        const fileData = reader.result.split(',')[1]; // Obtener base64 sin metadatos
+        const response = await fetch('/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ file: fileData })
+        });
+
+        const result = await response.text();
+        alert(result);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  </script>
+</head>
+<body>
+  <h1>Sube un Archivo</h1>
+  <form onsubmit="uploadFile(event)">
+    <input type="file" name="file" required>
+    <button type="submit">Subir</button>
+  </form>
+</body>
+</html>
